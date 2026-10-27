@@ -31,5 +31,5 @@ Se consolidaron más de **10.98 millones de transacciones válidas** que moviliz
 - `docs/`: Informe técnico y código fuente en LaTeX.
 
 ## Autor
-- **Alejandro Harold Roque Huamani**
+- **Alejandro Roque**
 - Portafolio de Ingeniería de Datos y Analítica
