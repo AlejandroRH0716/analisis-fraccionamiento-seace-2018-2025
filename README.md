@@ -10,6 +10,13 @@ Proyecto de ingeniería de datos y analítica forense enfocado en identificar pa
 
 Se consolidaron más de **10.98 millones de transacciones válidas** que movilizaron más de **S/ 115,657 millones de soles**.
 
+---
+
+## Vista Previa del Dashboard
+![Vista General del Dashboard Power BI](dashboard/img/pagina1_macro.png)
+
+---
+
 ## Métricas Clave
 - **Universo de Órdenes Consolidadas:** 10,986,092 transacciones oficiales.
 - **Presupuesto Total Movilizado:** S/ 115,657,656,996.18.
