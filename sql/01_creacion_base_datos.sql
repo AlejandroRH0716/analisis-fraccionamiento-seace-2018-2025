@@ -1,4 +1,3 @@
--- Creación de la base de datos y tabla principal de hechos
 CREATE DATABASE OSCE_Auditoria;
 GO
 
@@ -22,7 +21,6 @@ CREATE TABLE Fact_Ordenes_Compra (
 );
 GO
 
--- Índices no agrupados cubiertos para acelerar el consumo analítico
 CREATE NONCLUSTERED INDEX IX_Fact_Contratista_Monto
 ON Fact_Ordenes_Compra (RUC_Contratista, Monto_Total_Orden_Original)
 INCLUDE (Nombre_Razon_Contratista, Entidad, Fecha_De_Emision);

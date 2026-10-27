@@ -1,10 +1,9 @@
 import os
+import urllib
 import pandas as pd
 from sqlalchemy import create_engine
-import urllib
 
-# Configuración del motor SQL Server con ODBC Driver 17
-SERVER = 'localhost' # Modificar según el servidor
+SERVER = 'localhost'
 DATABASE = 'OSCE_Auditoria'
 
 params = urllib.parse.quote_plus(
@@ -16,9 +15,7 @@ params = urllib.parse.quote_plus(
 engine = create_engine(f"mssql+pyodbc:///?odbc_connect={params}", fast_executemany=True)
 
 def cargar_archivo_chunked(ruta_archivo, chunksize=50000):
-    """Carga archivos masivos por bloques asegurando tipificación estricta de RUC"""
-    print(f"Iniciando carga de: {ruta_archivo}")
-    for i, chunk in enumerate(pd.read_csv(ruta_archivo, chunksize=chunksize, dtype={'ruc_entidad': str, 'ruc_contratista': str})):
+    for chunk in pd.read_csv(ruta_archivo, chunksize=chunksize, dtype={'ruc_entidad': str, 'ruc_contratista': str}):
         chunk.rename(columns={
             'ruc_entidad': 'RUC_Entidad',
             'entidad': 'Entidad',
@@ -38,7 +35,3 @@ def cargar_archivo_chunked(ruta_archivo, chunksize=50000):
         chunk['Fecha_Registro'] = pd.to_datetime(chunk['Fecha_Registro'], errors='coerce')
         
         chunk.to_sql('Fact_Ordenes_Compra', con=engine, if_exists='append', index=False)
-        print(f"Lote {i+1} insertado ({chunksize} registros).")
-
-if __name__ == "__main__":
-    print("Pipeline ETL listo para ejecutarse sobre data/raw/")

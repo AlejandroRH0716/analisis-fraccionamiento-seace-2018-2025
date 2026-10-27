@@ -1,7 +1,6 @@
 USE OSCE_Auditoria;
 GO
 
--- Vista para Página 1: Resumen Mensual por Entidad
 CREATE OR ALTER VIEW vw_Resumen_Mensual_Entidades AS
 SELECT 
     YEAR(Fecha_De_Emision) AS Anio,
@@ -21,7 +20,6 @@ GROUP BY
     TipoDeContratacion;
 GO
 
--- Vista para Páginas 2 y 3: Auditoría por Proveedor y Detección de Recurrencia
 CREATE OR ALTER VIEW vw_Auditoria_Proveedores AS
 SELECT 
     YEAR(Fecha_De_Emision) AS Anio,

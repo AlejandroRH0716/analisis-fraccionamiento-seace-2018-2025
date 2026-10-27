@@ -4,9 +4,6 @@ import urllib
 import pandas as pd
 from sqlalchemy import create_engine
 
-# ==============================================================================
-# 1. CONFIGURACIÓN DE CONEXIÓN A SQL SERVER
-# ==============================================================================
 servidor = r"PC\SQLEXPRESS"
 base_datos = "OSCE_Auditoria"
 
@@ -21,10 +18,6 @@ cadena_conexion = (
 params = urllib.parse.quote_plus(cadena_conexion)
 engine = create_engine(f"mssql+pyodbc:///?odbc_connect={params}", fast_executemany=True)
 
-# ==============================================================================
-# 2. DEFINICIÓN DE TIPOS Y ESQUEMA
-# ==============================================================================
-# Evita conversiones automáticas erróneas en identificadores clave
 dtype_dict = {
     "ruc_entidad": str,
     "nro_de_orden": str,
@@ -38,12 +31,8 @@ columnas_fecha = [
     "fecha_de_notificacion"
 ]
 
-# ==============================================================================
-# 3. DETECCIÓN AUTOMÁTICA DE CARPETAS ANUALES (2018 - 2025)
-# ==============================================================================
 directorio_raiz = os.path.dirname(os.path.abspath(__file__))
 
-# Filtra únicamente carpetas cuyos nombres sean números de 4 dígitos (años)
 carpetas_anios = sorted([
     c for c in os.listdir(directorio_raiz) 
     if os.path.isdir(os.path.join(directorio_raiz, c)) and c.isdigit() and len(c) == 4
@@ -57,16 +46,12 @@ if not carpetas_anios:
 print(f"Directorio de trabajo: {directorio_raiz}")
 print(f"Carpetas de años detectadas para procesamiento: {carpetas_anios}\n")
 
-# ==============================================================================
-# 4. BUCLE DE EXTRACCIÓN, TRANSFORMACIÓN Y CARGA (ETL)
-# ==============================================================================
 total_archivos_procesados = 0
 total_filas_insertadas = 0
 
 for anio in carpetas_anios:
     ruta_anio = os.path.join(directorio_raiz, anio)
     
-    # Listar todos los archivos Excel (.xlsx / .xls), excluyendo temporales o diccionarios
     archivos_excel = sorted([
         f for f in os.listdir(ruta_anio)
         if f.lower().endswith((".xlsx", ".xls")) 
@@ -83,22 +68,16 @@ for anio in carpetas_anios:
         print(f"[{i}/{len(archivos_excel)}] Procesando: {nombre_archivo}...")
 
         try:
-            # 1. Identificar la hoja correcta de forma dinámica
             xls = pd.ExcelFile(ruta_completa)
             nombre_hoja = "CONOSCE" if "CONOSCE" in xls.sheet_names else xls.sheet_names[0]
 
-            # 2. Lectura en memoria con tipos estrictos
             df = pd.read_excel(xls, sheet_name=nombre_hoja, dtype=dtype_dict)
-
-            # 3. Estandarización de columnas a minúsculas sin espacios
             df.columns = [c.strip().lower() for c in df.columns]
 
-            # 4. Formateo y validación de campos de fecha
             for col in columnas_fecha:
                 if col in df.columns:
                     df[col] = pd.to_datetime(df[col], errors="coerce").dt.date
 
-            # 5. Limpieza de saltos de línea y retornos de carro en texto
             if "descripcion_orden" in df.columns:
                 df["descripcion_orden"] = (
                     df["descripcion_orden"]
@@ -107,7 +86,6 @@ for anio in carpetas_anios:
                     .str.strip()
                 )
 
-            # 6. Inserción masiva en lotes de 10,000 directo a SQL Server
             filas_archivo = len(df)
             print(f"   -> Insertando {filas_archivo:,} filas...")
             
@@ -123,7 +101,6 @@ for anio in carpetas_anios:
             total_archivos_procesados += 1
             print(f"   -> {nombre_archivo} cargado exitosamente.")
 
-            # 7. Liberar memoria RAM explícitamente antes del siguiente archivo
             del df
             del xls
 
